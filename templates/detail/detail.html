@@ -1,0 +1,257 @@
+<!-- json type -->
+
+<!--<script>-->
+
+<!--    function getdata(){-->
+<!--        $.ajax({-->
+<!--          url:'newsmenu_crowling',-->
+<!--          success:function(data){-->
+<!--            display(data),-->
+<!--            totalData = data.data.length-->
+<!--          }-->
+<!--        });-->
+<!--    };-->
+
+<!--    $(document).ready(function(){-->
+<!--        getdata();-->
+<!--    });-->
+
+<!--    function display(data){-->
+<!--        var output = '';-->
+
+<!--&lt;!&ndash;        output += '<thead>' + '<tr>' + '<th>'&ndash;&gt;-->
+<!--&lt;!&ndash;        output += '뉴스 기사 제목'&ndash;&gt;-->
+<!--&lt;!&ndash;        output += '</th>' + '</tr>' + '</thead>'&ndash;&gt;-->
+<!--&lt;!&ndash;        output += '<tbody>'&ndash;&gt;-->
+<!--        for(var i in data){-->
+<!--            output += '<tr>'-->
+<!--            output += '<th>'-->
+<!--            output += '<a href = "'-->
+<!--            output += data[i].url-->
+<!--            output += '">'-->
+<!--            output += data[i].title-->
+<!--            output += '</a>'-->
+<!--            output += '</th>'-->
+<!--            output += '</tr>'-->
+<!--        }-->
+<!--&lt;!&ndash;        output += '</tbody>'&ndash;&gt;-->
+
+<!--&lt;!&ndash;        document.getElementById("datatablesSimple").innerHTML = output;&ndash;&gt;-->
+<!--        $("tbody").html(output)-->
+<!--    }-->
+
+<!--</script>-->
+<!--<script>-->
+<!--&lt;!&ndash; 6자리 숫자가 아닐시 앞에 0을 추가해주는 함수 &ndash;&gt;-->
+<!--function leadingZeros(n, digits) {-->
+<!--  var zero = '';-->
+<!--  n = n.toString();-->
+
+<!--  if (n.length < digits) {-->
+<!--    for (var i = 0; i < digits - n.length; i++)-->
+<!--      zero += '0';-->
+<!--  }-->
+<!--  return zero + n;-->
+<!--}-->
+
+<!--  function day(code){-->
+<!--    var strcode = leadingZeros(code, 6)-->
+<!--    var result = '';-->
+<!--    result += '<img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/'-->
+<!--    result += strcode-->
+<!--    result += '.png?sidcode=1643450737002">'-->
+
+<!--    document.querySelector('#graph').innerHTML = result;-->
+<!--  };-->
+
+<!--  function week(code){-->
+<!--    var strcode = leadingZeros(code, 6)-->
+<!--    var result = '';-->
+<!--    result += '<img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/week/'-->
+<!--    result += strcode-->
+<!--    result += '.png?sidcode=1643450737002">';-->
+
+<!--    document.querySelector('#graph').innerHTML = result;-->
+<!--  };-->
+
+<!--  function month(code){-->
+<!--    var strcode = leadingZeros(code, 6)-->
+<!--    var result = '';-->
+<!--    result += '<img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/month/'-->
+<!--    result += strcode-->
+<!--    result += '.png?sidcode=1643450737002">';-->
+
+<!--    document.querySelector('#graph').innerHTML = result;-->
+<!--  };-->
+<!--</script>-->
+<script>
+    function ok(){
+        alert('담기 완료')
+    }
+    function fail(){
+        alert('로그인 필요')
+    }
+    function delok(){
+        alert('삭제 완료')
+    }
+</script>
+<!--메인 시작-->
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <ol class="breadcrumb mb-4"></ol>
+                        {% for i in items %}
+                            {% if request.session.sessionid == None %}
+                            <h1>
+                                {{i.name}}
+                                <form action="bookmark_insert" method="post" style="display:inline">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" value="{{i.url}}" type="submit" name="bookmarkurl" onclick="fail()">관심 종목 담기</button>
+                                <input style="background:none; width:800px; border:0px;" type="hidden" value="{{i.name}}" name="bookmarkstockname"/>
+                                </form>
+                                <form action="bookmark_delete" method="post" style="display:inline">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" value="{{i.name}}" type="submit" name="bookmarkname" onclick="fail()">관심 종목 삭제</button>
+                                <input style="background:none; width:800px; border:0px;" type="hidden" value="{{i.url}}" name="bookmarkstockurl"/>
+                                </form>
+                            </h1>
+                            {% else %}
+                            <h1>
+                                {{i.name}}
+                                <form action="bookmark_insert" method="post" style="display:inline">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" value="{{i.url}}" type="submit" name="bookmarkurl" onclick="ok()">관심 종목 담기</button>
+                                <input style="background:none; width:800px; border:0px;" type="hidden" value="{{i.name}}" name="bookmarkstockname"/>
+                                </form>
+                                <form action="bookmark_delete" method="post" style="display:inline">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" value="{{i.name}}" type="submit" name="bookmarkname" onclick="delok()">관심 종목 삭제</button>
+                                <input style="background:none; width:800px; border:0px;" type="hidden" value="{{i.url}}" name="bookmarkstockurl"/>
+                                </form>
+                            </h1>
+                            {% endif %}
+
+                            <form action="predict_page" method="post">
+                            {% csrf_token %}
+                                <h1><button class="btn btn-primary" value="{{name}}" type="submit" name="stock-name">주가 예측</button></h1>
+                            </form>
+
+                        <ol class="breadcrumb mb-4"></ol>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <table class="dataTable-table">
+                                    <tbody>
+                                        <h2 style="display:inline">현재가 : </h2>
+                                        <h2 style="display:inline">{{i.price}}</h2>
+                                    </tbody>
+                                </table>
+                                <table class="dataTable-table">
+                                    <tbody>
+                                        {% if i.p_eve_price|slice:':1' == '+' %}
+                                        <tr>
+                                            <th style="text-align:center">전일대비</th>
+                                            <td style="color:red">{{i.p_eve_price}}</td>
+                                            <th style="text-align:center">등락률</th>
+                                            <td style="color:red">{{i.eve_price_rate}}</td>
+                                        </tr>
+                                        {% elif i.p_eve_price|slice:':1' == '-' %}
+                                        <tr>
+                                            <th style="text-align:center">전일대비</th>
+                                            <td style="color:blue">{{i.p_eve_price}}</td>
+                                            <th style="text-align:center">등락률</th>
+                                            <td style="color:blue">{{i.eve_price_rate}}</td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <th style="text-align:center">전일대비</th>
+                                            <td style="color:green">{{i.p_eve_price}}</td>
+                                            <th style="text-align:center">등락률</th>
+                                            <td style="color:green">{{i.eve_price_rate}}</td>
+                                        </tr>
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                <table class="dataTable-table">
+                                    <tbody>
+                                    <tr>
+                                        <th style="text-align:center">전일</th>
+                                        <td>{{i.eve_price}}</td>
+                                        <th style="text-align:center">고가</th>
+                                        <td style="color:red">{{i.h_price}}</td>
+                                        <th style="text-align:center">거래량</th>
+                                        <td>{{i.trace}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center">시가</th>
+                                        <td style="color:green">{{i.m_price}}</td>
+                                        <th style="text-align:center">저가</th>
+                                        <td style="color:blue">{{i.l_price}}</td>
+                                        <th style="text-align:center">거래대금</th>
+                                        <td>{{i.trace_price}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table>
+
+                                    <form action="detail_daygraph" method="post">
+                                    {% csrf_token %}
+                                        <button class="btn btn-primary" value="{{i.url}}" type="submit" name="detail_url_day">일봉</button>
+                                    </form>
+                                    <a> </a>
+                                    <form action="detail_weekgraph" method="post">
+                                    {% csrf_token %}
+                                        <button class="btn btn-primary" value="{{i.url}}" type="submit" name="detail_url_week">주봉</button>
+                                    </form>
+                                    <a> </a>
+                                    <form action="detail_monthgraph" method="post">
+                                    {% csrf_token %}
+                                        <button class="btn btn-primary" value="{{i.url}}" type="submit" name="detail_url_month">월봉</button>
+                                    </form>
+                                    {% if center2 != None %}
+                                        {% include center2 %}
+                                    {% else %}
+                                    <div id="graph">
+                                    <img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/{{i.code}}.png?sidcode=1643450737002">
+<!--                                    <img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/week/{{i.code}}.png?sidcode=1643450737002">-->
+<!--                                    <img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/month/{{i.code}}.png?sidcode=1643450737002">-->
+                                    </div>
+                                    {% endif %}
+                                </table>
+                            </div>
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    '{{i.name}}' 연관 뉴스 메뉴
+                                </div>
+                                <div class="card-body">
+                                    <table id="datatablesSimple">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center">제목</th>
+                                                <th style="text-align:center">언론사</th>
+                                                <th style="text-align:center">등록 날짜/시간</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for i in itemlist %}
+                                            <tr>
+                                                <td><a href="{{i.link}}" target="_blank">{{i.title}}</a></td>
+                                                <td>{{i.press}}</td>
+                                                <td>{{i.dtime}}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Your Website 2022</div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
